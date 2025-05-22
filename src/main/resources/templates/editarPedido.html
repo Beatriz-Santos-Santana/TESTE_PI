@@ -113,7 +113,6 @@
         <label>Método de Pagamento:</label>
         <select name="metodoPagamento" >
             <option value="PIX" th:selected="${pedido.metodoPagamento == 'PIX'}">PIX</option>
-            <option value="BOLETO" th:selected="${pedido.metodoPagamento == 'BOLETO'}">Boleto</option>
             <option value="CREDITO" th:selected="${pedido.metodoPagamento == 'CREDITO'}">Cartão de Crédito</option>
             <option value="DEBITO" th:selected="${pedido.metodoPagamento == 'DEBITO'}">Cartão de Débito</option>
         </select>

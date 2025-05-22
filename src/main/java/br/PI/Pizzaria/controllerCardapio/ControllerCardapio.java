@@ -28,26 +28,23 @@ public class ControllerCardapio {
 
         List<Produto> produtos;
 
-        // Caso a pesquisa seja fornecida, filtra pelo nome
-        if (pesquisa != null && !pesquisa.isEmpty()) {
-            // Se a categoria também for fornecida, filtra pelo nome e pela categoria (categoria como substring no nome)
-            if (categoria != null && !categoria.isEmpty()) {
+        if (pesquisa != null && !pesquisa.isBlank()) {
+            if (categoria != null && !categoria.isBlank()) {
+                // Filtra por nome E categoria
                 produtos = produtoRepository.findByNomeContainingIgnoreCaseAndNomeContainingIgnoreCaseAndAtivoTrue(pesquisa, categoria);
             } else {
-                // Apenas pesquisa no nome
+                // Só pesquisa
                 produtos = produtoRepository.findByNomeContainingIgnoreCaseAndAtivoTrue(pesquisa);
             }
-        } else if (categoria != null && !categoria.isEmpty()) {
-            // Se apenas categoria for fornecida, filtra pelo nome (categoria sendo tratada como parte do nome)
+        } else if (categoria != null && !categoria.isBlank()) {
+            // Só categoria
             produtos = produtoRepository.findByNomeContainingIgnoreCaseAndAtivoTrue(categoria);
         } else {
-            // Se nada for fornecido, exibe todos os produtos ativos
             produtos = produtoRepository.findByAtivoTrue();
         }
 
         model.addAttribute("produtos", produtos);
 
-        // Adiciona o nome do cliente no modelo (se estiver disponível)
         try {
             String nomeCliente = CookieService.getCookie(request, "clienteNome");
             model.addAttribute("nomeCliente", nomeCliente);

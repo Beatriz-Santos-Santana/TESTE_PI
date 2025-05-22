@@ -183,27 +183,31 @@
     <div class="container">
         <h2 class="text-center text-danger mb-5">Nosso Cardápio</h2>
 
-
-        <form class="row g-3" method="get" action="/cardapio">
-            <div class="col-md-8">
-                <input type="text" name="pesquisa" class="form-control" placeholder="Digite o nome ou descrição do produto..."
-                       value="${param.pesquisa}">
-            </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-danger w-100">Pesquisar</button>
-            </div>
-            <div class="col-md-4">
-                <label for="categoria">Categoria:</label>
-                <select name="categoria" id="categoria">
-                    <option value="">Selecione uma Categoria</option>
+        <form method="get" action="/cardapio" class="row g-3 mb-4">
+            <!-- Filtro por Categoria -->
+            <div class="col-md-4 col-12">
+                <label for="categoria" class="form-label">Categoria</label>
+                <select name="categoria" id="categoria" class="form-select">
+                    <option value="">Todas as Categorias</option>
                     <option value="Pizza" th:selected="${param.categoria == 'Pizza'}">Pizza</option>
                     <option value="Bebida" th:selected="${param.categoria == 'Bebida'}">Bebida</option>
                     <option value="Sobremesa" th:selected="${param.categoria == 'Sobremesa'}">Sobremesa</option>
                 </select>
             </div>
+
+            <!-- Campo de Pesquisa -->
+            <div class="col-md-5 col-12">
+                <label for="pesquisa" class="form-label">Pesquisa</label>
+                <input type="text" name="pesquisa" id="pesquisa" class="form-control"
+                       placeholder="Digite o nome do produto..."
+                       th:value="${param.pesquisa}">
+            </div>
+
+            <!-- Botão -->
+            <div class="col-md-3 col-12 d-flex align-items-end">
+                <button type="submit" class="btn btn-danger w-100">Filtrar</button>
+            </div>
         </form>
-
-
 
 
 

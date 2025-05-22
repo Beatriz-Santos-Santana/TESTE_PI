@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Finalizar Pedido</title>
     <style>
         body {
@@ -116,13 +117,6 @@
         </div>
         <div class="payment-option">
             <label>
-                <input type="radio" name="metodoPagamento" value="BOLETO"
-                       th:attr="checked=${metodoSelecionado == 'BOLETO'}"
-                       onclick="mostrarCartao(false)"> Boleto
-            </label>
-        </div>
-        <div class="payment-option">
-            <label>
                 <input type="radio" name="metodoPagamento" value="CREDITO"
                        th:attr="checked=${metodoSelecionado == 'CREDITO'}"
                        onclick="mostrarCartao(true)"> Cartão de Crédito
@@ -162,10 +156,66 @@
 </div>
 
 <script>
-    // Função para mostrar os dados do cartão quando o método de pagamento for "CREDITO" ou "DEBITO"
     function mostrarCartao(mostrar) {
         document.getElementById('dadosCartao').style.display = mostrar ? 'block' : 'none';
     }
+
+    document.querySelector("form[action='/pagamento/finalizar']").addEventListener("submit", function (event) {
+        const metodo = document.querySelector("input[name='metodoPagamento']:checked");
+        if (!metodo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Método de Pagamento',
+                text: 'Por favor, selecione um método de pagamento.',
+                confirmButtonColor: '#c0392b'
+            });
+            event.preventDefault();
+            return;
+        }
+
+        const tipo = metodo.value;
+
+        if (tipo === "CREDITO" || tipo === "DEBITO") {
+            const nome = document.querySelector("input[name='nomeCartao']").value.trim();
+            const numero = document.querySelector("input[name='numeroCartao']").value.trim();
+            const validade = document.querySelector("input[name='validadeCartao']").value.trim();
+            const cvv = document.querySelector("input[name='codigoSeguranca']").value.trim();
+
+            if (!nome || !numero || !validade || !cvv) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Dados Incompletos',
+                    text: 'Preencha todos os campos do cartão para continuar.',
+                    confirmButtonColor: '#c0392b'
+                });
+                event.preventDefault();
+                return;
+            }
+
+            if (!/^\d{16}$/.test(numero.replace(/\s+/g, ''))) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Número do Cartão Inválido',
+                    text: 'O número do cartão deve conter 16 dígitos.',
+                    confirmButtonColor: '#c0392b'
+                });
+                event.preventDefault();
+                return;
+            }
+
+            if (!/^\d{3}$/.test(cvv)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'CVV Inválido',
+                    text: 'O código de segurança (CVV) deve conter 3 dígitos.',
+                    confirmButtonColor: '#c0392b'
+                });
+                event.preventDefault();
+                return;
+            }
+        }
+    });
 </script>
+
 </body>
 </html>
