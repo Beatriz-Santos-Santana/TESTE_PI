@@ -1,6 +1,8 @@
 package br.PI.Pizzaria.controllerPedidos;
 
 import br.PI.Pizzaria.modelCarrinho.ItemCarrinho;
+import br.PI.Pizzaria.modelPedidos.StatusPedido;
+
 import br.PI.Pizzaria.modelCliente.Cliente;
 import br.PI.Pizzaria.modelCliente.Endereco;
 import br.PI.Pizzaria.modelPedidos.ItemPedidos;
@@ -14,8 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +56,7 @@ public class PedidoController {
         BigDecimal total = BigDecimal.ZERO;
         for (ItemCarrinho item : itensCarrinho) {
             if (item.getProduto() == null) {
-                System.out.println("Produto nulo encontrado para o item com ID: " + item.getId()); // Log para depuração
+                System.out.println("Produto nulo encontrado para o item com ID: " + item.getId());
             } else {
                 total = total.add(BigDecimal.valueOf(item.getValor()).multiply(BigDecimal.valueOf(item.getQuantidade())));
             }
@@ -73,10 +73,8 @@ public class PedidoController {
         model.addAttribute("totalFinal", totalFinal);
         model.addAttribute("metodoPagamento", metodoPagamento);
 
-        return "resumoPedido"; // Mostra a página do resumo
+        return "resumoPedido";
     }
-
-
 
     // Método para concluir o pedido
     @PostMapping("/concluir")
@@ -84,7 +82,7 @@ public class PedidoController {
         String pedidoIdStr = CookieService.getCookie(request, "pedidoEmAndamento");
 
         if (pedidoIdStr == null) {
-            return "redirect:/cardapio";  // Se não encontrar o pedido, redireciona
+            return "redirect:/cardapio";
         }
 
         try {
@@ -92,20 +90,21 @@ public class PedidoController {
             Pedidos pedido = pedidoRepository.findById(pedidoId).orElse(null);
 
             if (pedido == null) {
-                return "redirect:/cardapio";  // Se não encontrar o pedido, redireciona
+                return "redirect:/cardapio";
             }
 
-            // Finaliza o pedido (aqui você pode marcar a data de finalização ou algo mais)
             pedido.setData(LocalDateTime.now());  // Marca a data de conclusão
+            pedido.setStatus(StatusPedido.FINALIZADO); // <- Aqui você seta o status
+
             pedidoRepository.save(pedido);
 
-            // Só remove o cookie após o pedido ser finalizado, quando não precisar mais da informação
             CookieService.setCookie(response, "pedidoEmAndamento", "", 0);
 
-            return "redirect:/pedido/finalizado";  // Página de finalização do pedido
+            return "redirect:/pedido/finalizado?pedidoId=" + pedido.getId();
+
 
         } catch (NumberFormatException e) {
-            return "redirect:/cardapio";  // Se o formato do ID do pedido estiver errado
+            return "redirect:/cardapio";
         }
     }
 
@@ -135,6 +134,37 @@ public class PedidoController {
             model.addAttribute("erro", "Erro ao recuperar o pedido: " + e.getMessage());
             return "pedidoFinalizado";
         }
+    }
+    @GetMapping("/gerenciar")
+    public String listarPedidosParaGerencia(Model model) {
+        List<Pedidos> pedidos = pedidoRepository.findAllByOrderByDataDesc(); // vamos criar esse método no repositório
+
+        model.addAttribute("pedidos", pedidos);
+        return "gerenciarPedidos"; // Criar um HTML com essa view
+    }
+
+    @GetMapping("/editar/{id}")
+    public String editarPedido(@PathVariable Long id, Model model) {
+        Pedidos pedido = pedidoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado"));
+        model.addAttribute("pedido", pedido);
+        return "editarPedido";
+    }
+
+    @PostMapping("/editar/{id}")
+    public String salvarEdicaoPedido(@PathVariable Long id, @RequestParam("status") String statusStr) {
+        Pedidos pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado"));
+
+        try {
+            StatusPedido status = StatusPedido.valueOf(statusStr);
+            pedido.setStatus(status);
+            pedidoRepository.save(pedido);
+        } catch (IllegalArgumentException e) {
+            // Status inválido
+            return "redirect:/pedido/editar/" + id + "?erro=statusInvalido";
+        }
+
+        return "redirect:/pedido/gerenciar";
     }
 
 

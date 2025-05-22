@@ -1,0 +1,12 @@
+<h2>Editar Pedido</h2>
+<form th:action="@{/pedido/editar/{id}(id=${pedido.id})}" method="post">
+    <label>Status:</label>
+    <select name="status" required>
+        <option th:each="status : ${T(br.PI.Pizzaria.modelPedidos.StatusPedido).values()}"
+                th:value="${status}"
+                th:text="${status}"
+                th:selected="${status} == ${pedido.status}">
+        </option>
+    </select>
+    <button type="submit">Salvar</button>
+</form>

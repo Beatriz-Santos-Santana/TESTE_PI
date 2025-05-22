@@ -2,8 +2,13 @@ package br.PI.Pizzaria.modelPedidos;
 
 public enum StatusPedido {
     PENDENTE,
-    EM_PREPARACAO,
-    SAIU_PARA_ENTREGA,
+    FINALIZADO,
+    AGUARDANDO_PAGAMENTO,
+    PAGAMENTO_REJEITADO,
+    PAGAMENTO_COM_SUCESSO,
+    AGUARDANDO_RETIRADA,
+    EM_TRANSITO,
     ENTREGUE
 }
+
 

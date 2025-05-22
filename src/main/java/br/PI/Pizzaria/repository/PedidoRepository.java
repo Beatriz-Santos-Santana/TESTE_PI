@@ -21,6 +21,7 @@ public interface PedidoRepository extends JpaRepository<Pedidos, Long> {
 
     Optional<Pedidos> findTopByClienteIdAndStatusOrderByDataDesc(Long clienteId, StatusPedido status);
 
+    List<Pedidos> findAllByOrderByDataDesc();
 
 }
 

@@ -1,0 +1,24 @@
+<h2>Gerenciar Pedidos</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Data</th>
+        <th>Valor Total</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="pedido : ${pedidos}">
+        <td th:text="${pedido.id}"></td>
+        <td th:text="${#temporals.format(pedido.data, 'dd/MM/yyyy HH:mm')}"></td>
+
+        <td th:text="${pedido.valorTotal}"></td>
+        <td th:text="${pedido.status}"></td>
+        <td>
+            <a th:href="@{/pedido/editar/{id}(id=${pedido.id})}">Editar</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
