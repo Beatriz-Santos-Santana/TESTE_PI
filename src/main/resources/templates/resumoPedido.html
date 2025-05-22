@@ -1,55 +1,153 @@
-<!-- resumoPedido.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Resumo do Pedido</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            margin-top: 30px;
+            color: #34495e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        p {
+            margin: 6px 0;
+        }
+
+        .section {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        button {
+            background-color: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background-color: #1e8449;
+        }
+
+        .btn-secondary {
+            background-color: #bdc3c7;
+        }
+
+        .btn-secondary:hover {
+            background-color: #95a5a6;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
 <h1>Resumo do Pedido</h1>
 
-<h3>Produtos</h3>
-<table>
-    <thead>
-    <tr>
-        <th>Produto</th>
-        <th>Quantidade</th>
-        <th>Valor Unitário</th>
-        <th>Subtotal</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="item : ${itensPedido}">
-        <td th:text="${item.produto != null ? item.produto.nome : 'Produto não encontrado'}"></td>
-        <td th:text="${item.quantidade}"></td>
-        <td th:text="${item.valor}"></td>
-        <td th:text="${item.valor * item.quantidade}"></td>
-    </tr>
-    </tbody>
-</table>
+<div class="section">
+    <h3>Produtos</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Valor Unitário</th>
+            <th>Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${itensPedido}">
+            <td th:text="${item.produto != null ? item.produto.nome : 'Produto não encontrado'}"></td>
+            <td th:text="${item.quantidade}"></td>
+            <td th:text="${item.valor}"></td>
+            <td th:text="${item.valor * item.quantidade}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
-<h3>Endereço de Entrega</h3>
-<p th:text="${endereco.logradouro}"></p>
-<p th:text="${endereco.numero}"></p>
-<p th:text="${endereco.bairro}"></p>
-<p th:text="${endereco.cidade + ', ' + endereco.uf}"></p>
+<div class="section">
+    <h3>Endereço de Entrega</h3>
+    <p th:text="${endereco.logradouro}"></p>
+    <p>Nº <span th:text="${endereco.numero}"></span></p>
+    <p th:text="${endereco.bairro}"></p>
+    <p th:text="${endereco.cidade + ', ' + endereco.uf}"></p>
+</div>
 
-<h3>Forma de Pagamento</h3>
-<p th:text="${metodoPagamento}"></p>
+<div class="section">
+    <h3>Forma de Pagamento</h3>
+    <p th:text="${metodoPagamento}"></p>
+</div>
 
-<h3>Total</h3>
-<p>Valor dos Produtos: <span th:text="${total}"></span></p>
-<p>Frete: <span th:text="${frete}"></span></p>
-<p>Total Geral: <span th:text="${totalFinal}"></span></p>
+<div class="section">
+    <h3>Total</h3>
+    <p>Valor dos Produtos: <span class="total" th:text="${total}"></span></p>
+    <p>Frete: <span class="total" th:text="${frete}"></span></p>
+    <p>Total Geral: <span class="total" th:text="${totalFinal}"></span></p>
+</div>
 
-<form action="/pedido/concluir" method="post">
-    <button type="submit">Concluir Compra</button>
-</form>
+<div class="button-group">
+    <form action="/pedido/concluir" method="post" style="display: inline;">
+        <button type="submit">Concluir Compra</button>
+    </form>
 
-<form action="/pagamento/pagamento" method="get">
-    <button type="submit">Voltar</button>
-</form>
+    <form action="/pagamento/pagamento" method="get" style="display: inline;">
+        <button type="submit" class="btn-secondary">Voltar</button>
+    </form>
+</div>
 
 </body>
 </html>

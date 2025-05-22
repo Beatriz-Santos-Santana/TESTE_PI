@@ -61,7 +61,7 @@ public class ItemPedidoController {
         item.atualizarSubTotal();
         item.setPedido(pedido);
 
-        itemPedidoRepository.save(item); // ✅ salva o item no banco
+        itemPedidoRepository.save(item); //  salva o item no banco
 
         // Recarrega todos os itens do pedido e recalcula o total
         List<ItemPedidos> todosItens = itemPedidoRepository.findByPedidoId(pedido.getId());

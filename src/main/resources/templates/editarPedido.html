@@ -1,12 +1,130 @@
-<h2>Editar Pedido</h2>
-<form th:action="@{/pedido/editar/{id}(id=${pedido.id})}" method="post">
-    <label>Status:</label>
-    <select name="status" required>
-        <option th:each="status : ${T(br.PI.Pizzaria.modelPedidos.StatusPedido).values()}"
-                th:value="${status}"
-                th:text="${status}"
-                th:selected="${status} == ${pedido.status}">
-        </option>
-    </select>
-    <button type="submit">Salvar</button>
-</form>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Pedido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+
+        input[readonly],
+        select:disabled {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            margin-top: 15px;
+            background-color: #6c757d;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Editar Pedido</h2>
+
+    <label>Número do Pedido:</label>
+    <input type="text" name="id" th:value="${pedido.id}" readonly />
+
+    <form th:action="@{/pedido/editar/{id}(id=${pedido.id})}" method="post">
+        <label>Valor Total:</label>
+        <input type="number" name="valorTotal" step="0.01" th:value="${pedido.valorTotal}" readonly />
+
+        <label>Status:</label>
+        <select name="status">
+            <option th:value="PENDENTE" th:selected="${pedido.status.name() == 'PENDENTE'}">Pendente</option>
+            <option th:value="FINALIZADO" th:selected="${pedido.status.name() == 'FINALIZADO'}">Finalizado</option>
+            <option th:value="AGUARDANDO_PAGAMENTO" th:selected="${pedido.status.name() == 'AGUARDANDO_PAGAMENTO'}">Aguardando Pagamento</option>
+            <option th:value="PAGAMENTO_REJEITADO" th:selected="${pedido.status.name() == 'PAGAMENTO_REJEITADO'}">Pagamento Rejeitado</option>
+            <option th:value="PAGAMENTO_COM_SUCESSO" th:selected="${pedido.status.name() == 'PAGAMENTO_COM_SUCESSO'}">Pagamento com Sucesso</option>
+            <option th:value="AGUARDANDO_RETIRADA" th:selected="${pedido.status.name() == 'AGUARDANDO_RETIRADA'}">Aguardando Retirada</option>
+            <option th:value="EM_TRANSITO" th:selected="${pedido.status.name() == 'EM_TRANSITO'}">Em Trânsito</option>
+            <option th:value="ENTREGUE" th:selected="${pedido.status.name() == 'ENTREGUE'}">Entregue</option>
+            <option th:value="RECEBIDO" th:selected="${pedido.status.name() == 'RECEBIDO'}">Recebido</option>
+        </select>
+
+        <label>Endereço:</label>
+        <input type="text" name="logradouro" th:value="${pedido.endereco.logradouro}" placeholder="Logradouro" readonly />
+        <input type="text" name="numero" th:value="${pedido.endereco.numero}" placeholder="Número" readonly />
+        <input type="text" name="bairro" th:value="${pedido.endereco.bairro}" placeholder="Bairro" readonly />
+        <input type="text" name="cidade" th:value="${pedido.endereco.cidade}" placeholder="Cidade" readonly />
+        <input type="text" name="uf" th:value="${pedido.endereco.uf}" placeholder="UF" readonly />
+
+        <label>Método de Pagamento:</label>
+        <select name="metodoPagamento" >
+            <option value="PIX" th:selected="${pedido.metodoPagamento == 'PIX'}">PIX</option>
+            <option value="BOLETO" th:selected="${pedido.metodoPagamento == 'BOLETO'}">Boleto</option>
+            <option value="CREDITO" th:selected="${pedido.metodoPagamento == 'CREDITO'}">Cartão de Crédito</option>
+            <option value="DEBITO" th:selected="${pedido.metodoPagamento == 'DEBITO'}">Cartão de Débito</option>
+        </select>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+
+    <a th:href="@{/pedido/gerenciar}">
+        <button class="back-button">Voltar</button>
+    </a>
+</div>
+
+</body>
+</html>

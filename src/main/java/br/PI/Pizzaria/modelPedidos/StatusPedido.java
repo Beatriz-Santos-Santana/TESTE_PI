@@ -8,7 +8,8 @@ public enum StatusPedido {
     PAGAMENTO_COM_SUCESSO,
     AGUARDANDO_RETIRADA,
     EM_TRANSITO,
-    ENTREGUE
+    ENTREGUE,
+    RECEBIDO
 }
 
 

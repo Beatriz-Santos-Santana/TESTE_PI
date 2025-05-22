@@ -18,7 +18,7 @@ public class DataConfiguration {
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://localhost:3306/pizzariabhg?useTimezone=true&serverTimezone=UTC");
         dataSource.setUsername("root");
-        dataSource.setPassword("Zirtaeb0707@@");
+        dataSource.setPassword("root");
         return dataSource;
     }
 

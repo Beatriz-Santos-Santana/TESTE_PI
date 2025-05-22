@@ -1,7 +1,17 @@
 package br.PI.Pizzaria.controllerPedidos;
 
 public enum StatusPedido {
-    EM_ANDAMENTO,
+    PENDENTE,
+    RECEBIDO,
+    AGUARDANDO_PAGAMENTO,
     FINALIZADO,
-    CANCELADO
+    PAGAMENTO_REJEITADO,
+    PAGAMENTO_SUCESSO,
+    AGUARDANDO_RETIRADA,
+    EM_TRANSITO,
+    ENTREGUE,
+
+
+    //aguardando pagamento, pagamento rejeitado, pagamento com sucesso, aguardando retirada, em transito, entregue
+
 }

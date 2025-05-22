@@ -175,12 +175,38 @@
     </div>
 </nav>
 
+
 <br><br>
 
 <!-- Cardápio -->
 <section class="cardapio" id="secao-cardapio">
     <div class="container">
         <h2 class="text-center text-danger mb-5">Nosso Cardápio</h2>
+
+
+        <form class="row g-3" method="get" action="/cardapio">
+            <div class="col-md-8">
+                <input type="text" name="pesquisa" class="form-control" placeholder="Digite o nome ou descrição do produto..."
+                       value="${param.pesquisa}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-danger w-100">Pesquisar</button>
+            </div>
+            <div class="col-md-4">
+                <label for="categoria">Categoria:</label>
+                <select name="categoria" id="categoria">
+                    <option value="">Selecione uma Categoria</option>
+                    <option value="Pizza" th:selected="${param.categoria == 'Pizza'}">Pizza</option>
+                    <option value="Bebida" th:selected="${param.categoria == 'Bebida'}">Bebida</option>
+                    <option value="Sobremesa" th:selected="${param.categoria == 'Sobremesa'}">Sobremesa</option>
+                </select>
+            </div>
+        </form>
+
+
+
+
+
         <div class="row">
             <div class="col-md-4 mb-4" th:each="produto : ${produtos}">
                 <div class="card h-100">

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -76,9 +77,10 @@ public class PedidoController {
         return "resumoPedido";
     }
 
-    // Método para concluir o pedido
+
+    // Página de confirmação do pedido finalizado
     @PostMapping("/concluir")
-    public String concluirPedido(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+    public String concluirPedido(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws UnsupportedEncodingException {
         String pedidoIdStr = CookieService.getCookie(request, "pedidoEmAndamento");
 
         if (pedidoIdStr == null) {
@@ -93,23 +95,39 @@ public class PedidoController {
                 return "redirect:/cardapio";
             }
 
-            pedido.setData(LocalDateTime.now());  // Marca a data de conclusão
-            pedido.setStatus(StatusPedido.FINALIZADO); // <- Aqui você seta o status
+            // Buscar dados da sessão para calcular total
+            List<ItemCarrinho> itensCarrinho = (List<ItemCarrinho>) session.getAttribute("carrinho");
 
+            if (itensCarrinho == null || itensCarrinho.isEmpty()) {
+                return "redirect:/carrinho";
+            }
+
+            BigDecimal total = BigDecimal.ZERO;
+            for (ItemCarrinho item : itensCarrinho) {
+                total = total.add(BigDecimal.valueOf(item.getValor()).multiply(BigDecimal.valueOf(item.getQuantidade())));
+            }
+
+            BigDecimal frete = BigDecimal.valueOf(10);
+            BigDecimal totalFinal = total.add(frete);
+
+            // Atualiza os dados do pedido
+            pedido.setData(LocalDateTime.now());
+            pedido.setValorTotal(totalFinal);
+            pedido.setStatus(StatusPedido.PENDENTE); // ou outro status que você use
+            pedido.setMetodoPagamento((String) session.getAttribute("metodoPagamento"));
+
+            session.removeAttribute("carrinho");
             pedidoRepository.save(pedido);
 
+            // Limpa cookie do pedido
             CookieService.setCookie(response, "pedidoEmAndamento", "", 0);
 
             return "redirect:/pedido/finalizado?pedidoId=" + pedido.getId();
 
-
         } catch (NumberFormatException e) {
             return "redirect:/cardapio";
         }
-    }
-
-    // Página de confirmação do pedido finalizado
-    @GetMapping("/finalizado")
+    }@GetMapping("/finalizado")
     public String pedidoFinalizado(Model model, @RequestParam(required = false) Long pedidoId) {
         try {
             Pedidos pedido = pedidoRepository.findById(pedidoId)
@@ -151,19 +169,43 @@ public class PedidoController {
     }
 
     @PostMapping("/editar/{id}")
-    public String salvarEdicaoPedido(@PathVariable Long id, @RequestParam("status") String statusStr) {
+    public String salvarEdicaoPedido( HttpSession session,
+            @PathVariable Long id,
+            @RequestParam String status,
+            @RequestParam BigDecimal valorTotal,
+            @RequestParam String logradouro,
+            @RequestParam String numero,
+            @RequestParam String bairro,
+            @RequestParam String cidade,
+            @RequestParam String uf,
+            @RequestParam String metodoPagamento
+    ) {
+        // Busca o pedido no banco de dados
         Pedidos pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado"));
 
-        try {
-            StatusPedido status = StatusPedido.valueOf(statusStr);
-            pedido.setStatus(status);
-            pedidoRepository.save(pedido);
-        } catch (IllegalArgumentException e) {
-            // Status inválido
-            return "redirect:/pedido/editar/" + id + "?erro=statusInvalido";
-        }
+        // Atualiza o status do pedido
+        pedido.setStatus(StatusPedido.valueOf(status));
 
+        // Atualiza o método de pagamento
+        pedido.setMetodoPagamento(metodoPagamento);
+
+        // Atualiza o endereço do pedido
+        Endereco endereco = pedido.getEndereco();
+        endereco.setLogradouro(logradouro);
+        endereco.setNumero(numero);
+        endereco.setBairro(bairro);
+        endereco.setCidade(cidade);
+        endereco.setUf(uf);
+
+        // Atualiza o valor total do pedido
+        pedido.setValorTotal(valorTotal);
+
+        // Salva o pedido com as modificações
+        pedidoRepository.save(pedido);
+
+
+        // Redireciona para a página de gerenciamento de pedidos
         return "redirect:/pedido/gerenciar";
     }
 

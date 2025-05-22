@@ -61,7 +61,7 @@
 <div th:if="${erro == null}" class="container">
     <h1>Pedido Finalizado com Sucesso!</h1>
     <p class="info">Número do Pedido: <strong th:text="${pedido.id}"></strong></p>
-    <p class="info">Valor Total: <span th:text="${#numbers.formatDecimal(valor, 1, 2)}"></span></p>
+    <p class="info">Valor Total: <span th:text="${pedido.valorTotal}"></span></p>
     <p class="info">Obrigado por comprar com a Pizzaria BHG!</p>
     <a href="/cardapio" class="btn-voltar">Voltar para a página inicial</a>
 </div>

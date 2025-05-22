@@ -37,6 +37,9 @@ public class Produto {
     @Column(name = "imagem")
     private String imagem;
 
+    private String categoria;
+
+
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImagemProduto> imagensSecundarias = new ArrayList<>();
 
@@ -148,5 +151,13 @@ public class Produto {
 
     public void setFinalizado(Boolean finalizado) {
         this.finalizado = finalizado;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }
