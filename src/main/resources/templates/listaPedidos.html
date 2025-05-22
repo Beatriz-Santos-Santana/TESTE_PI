@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lista de Pedidos</title>
+</head>
+<body>
+<h2>Meus Pedidos</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Data</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="pedido : ${pedidos}">
+        <td th:text="${pedido.id}">1</td>
+        <td th:text="${#dates.format(pedido.data, 'dd/MM/yyyy HH:mm')}">01/01/2024</td>
+        <td th:text="${pedido.valorTotal}">R$ 59.90</td>
+        <td th:text="${pedido.status}">PENDENTE</td>
+        <td>
+            <a th:href="@{/cliente/pedido/{id}(id=${pedido.id})}" class="btn btn-sm btn-primary">Detalhes</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

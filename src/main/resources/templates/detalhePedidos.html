@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Detalhe Pedidos</title>
+</head>
+<body>
+<h2>Detalhes do Pedido #<span th:text="${pedido.id}"></span></h2>
+<p>Data: <span th:text="${#dates.format(pedido.data, 'dd/MM/yyyy HH:mm')}"></span></p>
+<p>Status: <strong th:text="${pedido.status}"></strong></p>
+<p>Total: <strong th:text="${pedido.valorTotal}"></strong></p>
+
+<h4>Itens</h4>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Produto</th>
+        <th>Qtd</th>
+        <th>Preço Unit.</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${pedido.itens}">
+        <td th:text="${item.nomeProduto}">Pizza</td>
+        <td th:text="${item.quantidade}">2</td>
+        <td th:text="${item.precoUnitario}">R$ 29.95</td>
+        <td th:text="${item.precoUnitario * item.quantidade}">R$ 59.90</td>
+    </tr>
+    </tbody>
+</table>
+
+
+</body>
+</html>

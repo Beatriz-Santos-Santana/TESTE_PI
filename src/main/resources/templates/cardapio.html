@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pizzaria BHG</title>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Header */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-nav .nav-link {
+            color: #c0392b;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #922b21;
+        }
+
+        .btn-login {
+            background: none;
+            border: none;
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        /* Hero */
+        .hero {
+            background-size: cover;
+            height: 90vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero .btn {
+            padding: 12px 30px;
+            font-weight: bold;
+            background-color: #c0392b;
+            border: none;
+        }
+
+        /* Cardápio */
+        .cardapio {
+            padding: 4rem 0;
+        }
+
+        .cardapio .card {
+            border: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .cardapio .card:hover {
+            transform: scale(1.03);
+        }
+
+        /* Promoções */
+        .promocoes {
+            background-color: #fefefe;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        /* Contato */
+        #secao-contato {
+            background-color: #f9f9f9;
+            padding: 4rem 0;
+        }
+
+        .contato-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .contato-info div {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #ddd;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="/images/logo.png" alt="Logo" height="60">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#secao-cardapio">Cardápio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#secao-promocoes">Promoções</a></li>
+                <li class="nav-item"><a class="nav-link" href="#secao-contato">Contato</a></li>
+                <li class="nav-item">
+                    <a href="/carrinho" class="nav-link">
+                        🛒 (<span th:text="${session.carrinho != null ? #lists.size(session.carrinho) : 0}">0</span>)
+                    </a>
+                </li>
+                <!-- Se o cliente estiver logado -->
+                <li class="nav-item" th:if="${session.usuarioLogado != null}">
+                    <span class="nav-link">
+                    Olá,
+                    <a href="#" class="btn-login" data-bs-toggle="modal" data-bs-target="#clienteModal"
+                       style="text-decoration: underline; cursor: pointer;">
+                    <span th:text="${session.usuarioLogado.nome}">Cliente</span>
+                    </a> |
+                    <a href="/loginCliente" class="btn-login" onclick="confirmarLogout(event)">Logout</a>
+                    </span>
+                </li>
+                <!-- Se não estiver logado -->
+                <li class="nav-item" th:if="${session.usuarioLogado == null}">
+                    <a class="nav-link" href="/loginCliente">Login</a>
+                </li>
+                <li class="nav-item" th:if="${session.usuarioLogado == null}">
+                    <a class="nav-link" href="/cadastroCliente">Cadastre-se</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<br><br>
+
+<!-- Cardápio -->
+<section class="cardapio" id="secao-cardapio">
+    <div class="container">
+        <h2 class="text-center text-danger mb-5">Nosso Cardápio</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="produto : ${produtos}">
+                <div class="card h-100">
+                    <!-- Exibe somente a imagem principal -->
+                    <img th:src="@{'/uploads/imagens/' + ${produto.getImagem()}}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Imagem principal do produto">
+
+                    <div class="card-body text-center">
+                        <h5 th:text="${produto.nome}"></h5>
+                        <p class="text-muted">R$ <span th:text="${produto.valor}"></span></p>
+                        <!-- Botão para visualização de detalhes, visível para todos -->
+                        <a href="#" class="btn btn-outline-danger"
+                           data-bs-toggle="modal"
+                           data-bs-target="#visualizarModal"
+                           th:attr="data-id=${produto.id},
+                                    data-nome=${produto.nome},
+                                    data-descricao=${produto.descricao},
+                                    data-preco=${produto.valor},
+                                    data-avaliacao=${produto.avaliacao},
+                                    data-imagens=${#strings.arrayJoin(produto.todasImagens, ',')}">
+                            Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Promoções -->
+<section id="secao-promocoes" class="promocoes">
+    <div class="container">
+        <h2 class="text-danger mb-3">Promoções da Semana</h2>
+        <p class="lead">Aproveite nossas ofertas especiais! Somente por tempo limitado.</p>
+    </div>
+</section>
+
+<!-- Contato -->
+<section id="secao-contato">
+    <div class="container">
+        <h2 class="text-danger text-center mb-5">Fale Conosco</h2>
+        <div class="contato-info">
+            <div>
+                <h5>WhatsApp</h5>
+                <p><i class="fab fa-whatsapp me-2"></i>(11) 91234-5678</p>
+            </div>
+            <div>
+                <h5>Instagram</h5>
+                <p><i class="fab fa-instagram me-2"></i>@pizzariabhg</p>
+            </div>
+            <div>
+                <h5>Telefone</h5>
+                <p><i class="fas fa-phone me-2"></i>(11) 4002-8922</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Detalhes Produto -->
+<div class="modal fade" id="visualizarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes do Produto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <!-- Carrossel de imagens -->
+                <div id="modalCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div id="modalCarouselInner" class="carousel-inner">
+                        <!-- As imagens serão injetadas aqui pelo JavaScript -->
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>
+                <br>
+                <p><strong>Nome:</strong> <span id="modalNome"></span></p>
+                <p><strong>Descrição:</strong> <span id="modalDescricao"></span></p>
+                <p><strong>Preço:</strong> R$ <span id="modalPreco"></span></p>
+                <p><strong>Avaliação:</strong> <span id="modalAvaliacao"></span></p>
+            </div>
+            <div class="modal-footer">
+                <form id="formAdicionarCarrinho" method="post">
+                    <button type="submit" class="btn btn-danger">Adicionar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cliente -->
+<div class="modal fade" id="clienteModal" tabindex="-1" aria-labelledby="clienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="clienteModalLabel" th:if="${session.usuarioLogado != null}">
+                    Olá, <span th:text="${session.usuarioLogado.nome}">Cliente</span>!
+                </h5>
+
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body" th:if="${session.usuarioLogado != null}">
+                <div class="d-grid gap-2">
+                    <a th:href="@{'/editarCliente/' + ${session.usuarioLogado.id}}" class="btn btn-primary">Editar Cadastro</a>
+                    <a href="/carrinho" class="btn btn-success">Visualizar Carrinho</a>
+                    <a href="/cliente/pedidos" class="btn btn-secondary">Histórico de Compras</a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2025 Pizzaria BHG - Todos os direitos reservados.</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const modal = document.getElementById('visualizarModal');
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('modalNome').textContent = button.getAttribute('data-nome');
+        document.getElementById('modalDescricao').textContent = button.getAttribute('data-descricao');
+        document.getElementById('modalPreco').textContent = button.getAttribute('data-preco');
+        document.getElementById('modalAvaliacao').textContent = button.getAttribute('data-avaliacao');
+
+        const imagens = button.getAttribute('data-imagens').split(',');
+        const inner = document.getElementById('modalCarouselInner');
+        inner.innerHTML = ''; // Limpar imagens anteriores
+
+        imagens.forEach((img, i) => {
+            const div = document.createElement('div');
+            div.className = 'carousel-item' + (i === 0 ? ' active' : '');
+            div.innerHTML = `<img src="/uploads/imagens/${img}" class="d-block w-100" style="height:200px; object-fit:cover;" alt="...">`;
+            inner.appendChild(div);
+        });
+
+        const id = button.getAttribute('data-id');
+        document.getElementById('formAdicionarCarrinho').action = `/carrinho/adicionar/${id}`;
+    });
+
+    function confirmarLogout(event) {
+        event.preventDefault(); // Impede a navegação imediata
+
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: "Você quer sair?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, sair',
+            confirmButtonColor: '#922b21',
+            cancelButtonText: 'Não, cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/logoutCliente"; // Redireciona para a página de logout
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<form id="formEndereco" method="post">
+    <div id="enderecosExistentes">
+        <div th:each="endereco : ${enderecos}" class="endereco-card">
+            <label>
+                <!-- Único input de tipo radio -->
+                <input type="radio" name="enderecoSelecionado" th:value="${endereco.id}"
+                       th:attr="checked=${enderecoSelecionado != null and endereco.id == enderecoSelecionado.id}">
+                <span th:text="${endereco.logradouro} + ', ' + ${endereco.numero} + ' - ' + ${endereco.bairro} + ', ' + ${endereco.cidade} + '/' + ${endereco.uf}"></span>
+            </label>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-outline-primary my-4" onclick="mostrarNovoEndereco()">+ Adicionar Novo Endereço</button>
+
+    <div id="novoEndereco" style="display: none;">
+        <h4>Novo Endereço</h4>
+
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label>CEP</label>
+                <input type="text" class="form-control" name="cepNovo" id="cepNovo" onblur="consultarCEP(this.value)">
+            </div>
+            <div class="col-md-6">
+                <label>Logradouro</label>
+                <input type="text" class="form-control" name="logradouroNovo" id="logradouroNovo">
+            </div>
+            <div class="col-md-2">
+                <label>Número</label>
+                <input type="text" class="form-control" name="numeroNovo">
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <label>Bairro</label>
+                <input type="text" class="form-control" name="bairroNovo" id="bairroNovo">
+            </div>
+            <div class="col-md-6">
+                <label>Complemento</label>
+                <input type="text" class="form-control" name="complementoNovo">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label>Cidade</label>
+                <input type="text" class="form-control" name="cidadeNovo" id="cidadeNovo">
+            </div>
+            <div class="col-md-4">
+                <label>UF</label>
+                <input type="text" class="form-control" name="ufNovo" id="ufNovo">
+            </div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="principal" id="novoPrincipal" value="true" checked>
+            <label class="form-check-label" for="novoPrincipal">
+                Usar este novo endereço como principal
+            </label>
+        </div>
+    </div>
+
+    <form th:action="@{/selecionarPagamento.html}" method="post">
+        <button type="submit" class="btn btn-primary">Selecionar Pagamento</button>
+    </form>
+</form>
+
+<form action="/carrinho" method="get">
+    <button type="submit">Voltar</button>
+</form>
+
+<script>
+    // Função para mostrar o formulário de adicionar novo endereço
+    function mostrarNovoEndereco() {
+        document.getElementById("novoEndereco").style.display = "block";
+    }
+
+    // Evento de envio do formulário para definir a ação dinamicamente
+    document.getElementById("formEndereco").addEventListener("submit", function(event) {
+        const usandoNovo = document.getElementById("novoEndereco").style.display === "block";
+        const form = event.target;
+
+        if (usandoNovo) {
+            form.action = "/enderecos/adicionar";
+        } else {
+            form.action = "/enderecos/selecionar";
+        }
+
+        console.log("Formulário enviado para: " + form.action);  // Log da ação
+    });
+
+    // Função para consultar o CEP e preencher os campos automaticamente
+    async function consultarCEP(cep) {
+        cep = cep.replace(/\D/g, ''); // Remove qualquer caractere não numérico
+
+        if (cep.length === 8) {
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                if (!response.ok) throw new Error("Erro ao buscar CEP");
+
+                const data = await response.json();
+                if (data.erro) {
+                    alert("CEP não encontrado.");
+                    return;
+                }
+
+                // Preenchendo os campos com os dados do CEP
+                document.getElementById('logradouroNovo').value = data.logradouro || '';
+                document.getElementById('bairroNovo').value = data.bairro || '';
+                document.getElementById('cidadeNovo').value = data.localidade || '';
+                document.getElementById('ufNovo').value = data.uf || '';
+            } catch (error) {
+                alert("Erro ao consultar o CEP.");
+                console.error(error);
+            }
+        } else {
+            alert("CEP inválido.");
+        }
+    }
+</script>
