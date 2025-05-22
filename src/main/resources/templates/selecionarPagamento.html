@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input[type="text"], input[type="month"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .payment-option {
+            margin-bottom: 10px;
+        }
+
+        .payment-option input[type="radio"] {
+            transform: scale(1.2);
+        }
+
+        .payment-option label {
+            font-size: 16px;
+            color: #444;
+        }
+
+        #dadosCartao {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #dadosCartao input[type="text"], #dadosCartao input[type="month"] {
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Finalizar Pedido</h2>
+    <form method="post" action="/pagamento/finalizar">
+        <label>Escolha o método de pagamento:</label>
+
+        <div class="payment-option">
+            <label>
+                <input type="radio" name="metodoPagamento" value="PIX"
+                       th:attr="checked=${metodoSelecionado == 'PIX'}"
+                       onclick="mostrarCartao(false)"> Pix
+            </label>
+        </div>
+        <div class="payment-option">
+            <label>
+                <input type="radio" name="metodoPagamento" value="BOLETO"
+                       th:attr="checked=${metodoSelecionado == 'BOLETO'}"
+                       onclick="mostrarCartao(false)"> Boleto
+            </label>
+        </div>
+        <div class="payment-option">
+            <label>
+                <input type="radio" name="metodoPagamento" value="CREDITO"
+                       th:attr="checked=${metodoSelecionado == 'CREDITO'}"
+                       onclick="mostrarCartao(true)"> Cartão de Crédito
+            </label>
+        </div>
+        <div class="payment-option">
+            <label>
+                <input type="radio" name="metodoPagamento" value="DEBITO"
+                       th:attr="checked=${metodoSelecionado == 'DEBITO'}"
+                       onclick="mostrarCartao(true)"> Cartão de Débito
+            </label>
+        </div>
+
+
+        <div id="dadosCartao" style="display: none;">
+            <label>Nome no Cartão:</label>
+            <input type="text" name="nomeCartao" placeholder="Ex: João Silva">
+
+            <label>Número do Cartão:</label>
+            <input type="text" name="numeroCartao" placeholder="#### #### #### ####">
+
+            <label>Validade:</label>
+            <input type="month" name="validadeCartao">
+
+            <label>CVV:</label>
+            <input type="text" name="codigoSeguranca" placeholder="Ex: 123" maxlength="3">
+        </div>
+        <button type="submit">Finalizar Pedido</button>
+    </form>
+   <br>
+    <form action="/enderecos" method="get">
+        <button type="submit">Voltar</button>
+    </form>
+    <div class="form-footer">
+        <p>© 2025 Seu Site</p>
+    </div>
+</div>
+
+<script>
+    // Função para mostrar os dados do cartão quando o método de pagamento for "CREDITO" ou "DEBITO"
+    function mostrarCartao(mostrar) {
+        document.getElementById('dadosCartao').style.display = mostrar ? 'block' : 'none';
+    }
+</script>
+</body>
+</html>

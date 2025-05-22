@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido Finalizado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .erro h1 {
+            color: #dc3545;
+        }
+
+        .info {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .btn-voltar {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .btn-voltar:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div th:if="${erro != null}" class="container erro">
+    <h1>Erro ao Finalizar Pedido</h1>
+    <p class="info" th:text="${erro}">Ocorreu um erro desconhecido.</p>
+    <a href="/" class="btn-voltar">Voltar para a página inicial</a>
+</div>
+
+<div th:if="${erro == null}" class="container">
+    <h1>Pedido Finalizado com Sucesso!</h1>
+    <p class="info">Número do Pedido: <strong th:text="${pedido.id}"></strong></p>
+    <p class="info">Valor Total: <span th:text="${#numbers.formatDecimal(valor, 1, 2)}"></span></p>
+    <p class="info">Obrigado por comprar com a Pizzaria BHG!</p>
+    <a href="/" class="btn-voltar">Voltar para a página inicial</a>
+</div>
+
+</body>
+</html>

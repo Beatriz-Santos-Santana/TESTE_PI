@@ -1,0 +1,55 @@
+<!-- resumoPedido.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumo do Pedido</title>
+</head>
+<body>
+
+<h1>Resumo do Pedido</h1>
+
+<h3>Produtos</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Produto</th>
+        <th>Quantidade</th>
+        <th>Valor Unitário</th>
+        <th>Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${itensPedido}">
+        <td th:text="${item.produto != null ? item.produto.nome : 'Produto não encontrado'}"></td>
+        <td th:text="${item.quantidade}"></td>
+        <td th:text="${item.valor}"></td>
+        <td th:text="${item.valor * item.quantidade}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Endereço de Entrega</h3>
+<p th:text="${endereco.logradouro}"></p>
+<p th:text="${endereco.numero}"></p>
+<p th:text="${endereco.bairro}"></p>
+<p th:text="${endereco.cidade + ', ' + endereco.uf}"></p>
+
+<h3>Forma de Pagamento</h3>
+<p th:text="${metodoPagamento}"></p>
+
+<h3>Total</h3>
+<p>Valor dos Produtos: <span th:text="${total}"></span></p>
+<p>Frete: <span th:text="${frete}"></span></p>
+<p>Total Geral: <span th:text="${totalFinal}"></span></p>
+
+<form action="/pedido/concluir" method="post">
+    <button type="submit">Concluir Compra</button>
+</form>
+
+<form action="/pagamento/pagamento" method="get">
+    <button type="submit">Voltar</button>
+</form>
+
+</body>
+</html>
